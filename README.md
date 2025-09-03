@@ -1,8 +1,8 @@
-# 🚀 Proyecto Globo Sonda: Telemetría y Seguimiento en Tiempo Real
+# 🚀 Trabajo de Grado: Globo Sonda UCAB
 
-Este repositorio contiene todo el software y la documentación necesarios para construir y operar un globo sonda de gran altitud. El sistema está diseñado para capturar datos atmosféricos y de geolocalización, transmitirlos en tiempo real a una estación terrena a través del protocolo de comunicación LoRa, y visualizarlos en un dashboard de telemetría y un mapa interactivo.
+Este repositorio contiene todo el software y la documentación necesaria para reproducir el experimento descrito en el trabajo de grado "Diseño y desarrollo de un sistema de comunicación punto a punto para cápsula de globo sonda", escrito por Jesús Serrano y Sara Pérez. El sistema está diseñado para capturar datos atmosféricos y de geolocalización, transmitirlos en tiempo real a una estación terrena a través del protocolo de comunicación LoRa, y visualizarlos en un dashboard de telemetría y un mapa interactivo.
 
-Este proyecto fue desarrollado como el trabajo de grado "Diseño y desarrollo de un sistema de comunicación punto a punto para cápsula de globo sonda", escrito por Jesús Serrano y Sara Pérez. El trabajo tuvo la misión de ser completamente de código abierto, permitiendo que estudiantes, entusiastas e investigadores puedan replicar, modificar y mejorar este trabajo en futuras iteraciones.
+Esta investigación tuvo como misión ser completamente de código abierto, permitiendo que estudiantes, entusiastas e investigadores puedan replicar, modificar, mejorar y expandir el alcance de este trabajo en futuras iteraciones.
 
  <!-- Reemplaza esto con una captura de pantalla de tu dashboard -->
  <!-- Reemplaza esto con una captura de pantalla de tu mapa -->
@@ -34,7 +34,7 @@ Este proyecto fue desarrollado como el trabajo de grado "Diseño y desarrollo de
 El proyecto se divide en dos partes principales: la **Carga Útil (Transmisor)** que asciende con el globo, y la **Estación Terrena (Receptor)** que recibe y procesa los datos.
 
 1.  **Transmisor (Lilygo T-Beam)**: Recopila datos de múltiples sensores (GPS, BME280, BMI160, DHT22), los formatea en una cadena CSV y los envía a través de LoRa.
-2.  **Receptor (LoRa32)**: Recibe los paquetes de datos LoRa. Actúa como un puente, enviando los datos recibidos a través del puerto serie (USB) a un ordenador y, como respaldo, los guarda en una tarjeta microSD.
+2.  **Receptor (LoRa32)**: Recibe los paquetes de datos LoRa. Actúa como un puente, enviando los datos recibidos a través del puerto serie (USB) a una computadora.
 3.  **Estación Terrena (PC)**:
     *   Un script de Python (`dashboard_y_rx.py`) lee los datos del puerto serie, los muestra en un dashboard de telemetría en tiempo real (usando Matplotlib) y los guarda en un archivo `datos_globo_sonda.csv`.
     *   Otro script de Python (`mapa.py`) actúa como un servidor web (usando Flask) que monitorea el archivo CSV.
@@ -57,8 +57,7 @@ El proyecto se divide en dos partes principales: la **Carga Útil (Transmisor)**
 
 **Para la Estación Terrena (Receptor):**
 *   **Microcontrolador:** Placa de desarrollo LoRa32 (ESP32 con módulo LoRa).
-*   **Almacenamiento:** Módulo para tarjetas microSD con una tarjeta formateada en FAT32.
-*   **Ordenador** para ejecutar los scripts de Python.
+*   **Computadora** para ejecutar los scripts de Python.
 
 ### Software y Librerías
 
