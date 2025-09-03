@@ -236,7 +236,7 @@ Este sistema proporciona una interfaz web accesible para seguir la ubicación de
 
 ## 📄 Licencia
 
-Este proyecto se distribuye bajo la **Licencia MIT**. Esto significa que eres libre de usar, copiar, modificar, fusionar, publicar, distribuir, sublicenciar y/o vender copias del software. Consulta el archivo `LICENSE` para más detalles.
+Este proyecto se distribuye bajo la **Licencia MIT**. Esto significa que eres libre de usar, copiar, modificar, fusionar, publicar, distribuir y sublicenciar este software.
 ---
 
-¡Gracias por tu interés en este proyecto! Si tienes alguna pregunta o sugerencia, no dudes en abrir un *Issue* en este repositorio
+¡Gracias por tu interés en este proyecto! Si tienes alguna pregunta, no dudes en abrir un *Issue* en este repositorio o escribir a los autores de este trabajo de grado por correo electrónico.
