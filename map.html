@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Real-Time GPS Tracker</title>
+    
+    <!-- 1. Include Leaflet.js CSS and JS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+     integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+     crossorigin=""/>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+     integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+     crossorigin=""></script>
+
+    <style>
+        html, body { height: 100%; margin: 0; padding: 0; font-family: sans-serif; }
+        #map { height: 100vh; width: 100vw; }
+        .info-overlay {
+            position: absolute; top: 10px; right: 10px; z-index: 1000;
+            background: rgba(255, 255, 255, 0.85); padding: 10px;
+            border-radius: 5px; box-shadow: 0 0 15px rgba(0,0,0,0.2);
+        }
+        .live-indicator { color: red; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+    <div id="map"></div>
+
+    <div class="info-overlay">
+        <h3><span class="live-indicator">●</span> LIVE</h3>
+        <label><input type="checkbox" id="follow-toggle" checked> Follow</label>
+    </div>
+
+    <script>
+        // --- 2. GET INITIAL DATA FROM FLASK ---
+        // Flask's `render_template` injects the data here.
+        // The `|tojson` filter correctly formats it as a JSON object.
+        const initialData = {{ initial_data|tojson }};
+
+        // --- 3. INITIALIZE THE MAP ---
+        const map = L.map('map').setView(initialData.start_location, initialData.zoom);
+
+        // Add a satellite tile layer
+        L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+            attribution: 'Esri — Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community',
+            maxZoom: 19
+        }).addTo(map);
+
+        // --- 4. DRAW INITIAL & LIVE ELEMENTS ---
+        let lastPoint = initialData.last_point;
+        let livePath;
+        let liveMarker;
+
+        // Draw historical path if it exists
+        if (initialData.historical_path && initialData.historical_path.length > 0) {
+            L.polyline(initialData.historical_path, {
+                color: 'yellow',
+                weight: 3,
+                opacity: 0.8
+            }).addTo(map);
+        }
+
+        // Initialize live path and marker from the last historical point
+        if (lastPoint) {
+            const startLatLng = [lastPoint.Lat, lastPoint.Lon];
+            livePath = L.polyline([startLatLng], { color: 'red', weight: 4, opacity: 0.9 }).addTo(map);
+            liveMarker = L.circleMarker(startLatLng, {
+                radius: 8, color: 'red', fillColor: '#f03', fillOpacity: 0.9,
+            }).addTo(map);
+            liveMarker.bindPopup(`<b>Starting Live Feed</b><br>Altitude: ${lastPoint.Alt_GPS.toFixed(2)}m`).openPopup();
+        }
+
+        // --- 5. CONNECT TO THE REAL-TIME STREAM ---
+        console.log("Connecting to data stream at /stream...");
+        const eventSource = new EventSource("/stream");
+
+        eventSource.onmessage = function(event) {
+            const newPoint = JSON.parse(event.data);
+            console.log("Received new point:", newPoint);
+            const newLatLng = [newPoint.Lat, newPoint.Lon];
+
+            if (!liveMarker) {
+                // This is the first point ever. Create the live layers.
+                livePath = L.polyline([newLatLng], { color: 'red', weight: 4, opacity: 0.9 }).addTo(map);
+                liveMarker = L.circleMarker(newLatLng, {
+                    radius: 8, color: 'red', fillColor: '#f03', fillOpacity: 0.9,
+                }).addTo(map);
+            } else {
+                // Update existing layers
+                livePath.addLatLng(newLatLng);
+                liveMarker.setLatLng(newLatLng);
+            }
+
+            // Update popup and pan map if needed
+            liveMarker.setPopupContent(`<b>Current Position</b><br>Altitude: ${newPoint.Alt_GPS.toFixed(2)}m`);
+            if (document.getElementById('follow-toggle').checked) {
+                map.panTo(newLatLng);
+            }
+            lastPoint = newPoint;
+        };
+
+        eventSource.onerror = function(err) {
+            console.error("EventSource failed:", err);
+            eventSource.close();
+        };
+    </script>
+</body>
+</html>
